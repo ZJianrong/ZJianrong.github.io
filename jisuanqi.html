@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>科学计算器</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: #f0f2f5;
+        }
+
+        .calculator {
+            background: #333;
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+            width: 320px;
+        }
+
+        #display {
+            width: 100%;
+            height: 80px;
+            background: #222;
+            color: white;
+            font-size: 2em;
+            text-align: right;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+        }
+
+        button {
+            border: none;
+            padding: 20px;
+            font-size: 1.2em;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        button:hover {
+            filter: brightness(1.2);
+        }
+
+        .number {
+            background: #505050;
+            color: white;
+        }
+
+        .operator {
+            background: #ff9500;
+            color: white;
+        }
+
+        .equal {
+            background: #007AFF;
+        }
+
+        .clear {
+            background: #a5a5a5;
+        }
+
+        .span-2 {
+            grid-column: span 2;
+        }
+    </style>
+</head>
+<body>
+    <div class="calculator">
+        <input type="text" id="display" readonly>
+        <div class="buttons">
+            <button class="clear" onclick="clearDisplay()">C</button>
+            <button class="operator" onclick="appendToDisplay('÷')">÷</button>
+            <button class="operator" onclick="appendToDisplay('×')">×</button>
+            <button class="operator" onclick="deleteLast()">⌫</button>
+            
+            <button class="number" onclick="appendToDisplay('7')">7</button>
+            <button class="number" onclick="appendToDisplay('8')">8</button>
+            <button class="number" onclick="appendToDisplay('9')">9</button>
+            <button class="operator" onclick="appendToDisplay('-')">-</button>
+            
+            <button class="number" onclick="appendToDisplay('4')">4</button>
+            <button class="number" onclick="appendToDisplay('5')">5</button>
+            <button class="number" onclick="appendToDisplay('6')">6</button>
+            <button class="operator" onclick="appendToDisplay('+')">+</button>
+            
+            <button class="number" onclick="appendToDisplay('1')">1</button>
+            <button class="number" onclick="appendToDisplay('2')">2</button>
+            <button class="number" onclick="appendToDisplay('3')">3</button>
+            <button class="operator equal" onclick="calculate()" style="grid-row: span 2">=</button>
+            
+            <button class="number span-2" onclick="appendToDisplay('0')">0</button>
+            <button class="number" onclick="appendToDisplay('.')">.</button>
+        </div>
+    </div>
+
+    <script>
+        let display = document.getElementById('display');
+        
+        // 追加输入内容
+        function appendToDisplay(value) {
+            // 自动处理运算符替换
+            const lastChar = display.value.slice(-1);
+            const operators = ['+', '-', '×', '÷'];
+            
+            if (operators.includes(lastChar) && operators.includes(value)) {
+                display.value = display.value.slice(0, -1) + value;
+            } else {
+                display.value += value;
+            }
+        }
+
+        // 计算结果
+        function calculate() {
+            try {
+                let expression = display.value
+                    .replace(/×/g, '*')
+                    .replace(/÷/g, '/');
+                
+                // 处理小数点开头的情况
+                expression = expression.replace(/(^|[-+*/])\./g, '$10.');
+                
+                const result = eval(expression);
+                display.value = Number.isInteger(result) ? result : result.toFixed(4);
+            } catch (error) {
+                display.value = "错误";
+                setTimeout(clearDisplay, 1000);
+            }
+        }
+
+        // 清空显示屏
+        function clearDisplay() {
+            display.value = '';
+        }
+
+        // 删除最后一个字符
+        function deleteLast() {
+            display.value = display.value.slice(0, -1);
+        }
+
+        // 键盘支持
+        document.addEventListener('keydown', (e) => {
+            const key = e.key;
+            if (key >= '0' && key <= '9' || key === '.') {
+                appendToDisplay(key);
+            } else if (key === '+' || key === '-' || key === '*' || key === '/') {
+                appendToDisplay(key === '*' ? '×' : key === '/' ? '÷' : key);
+            } else if (key === 'Enter') {
+                calculate();
+            } else if (key === 'Backspace') {
+                deleteLast();
+            } else if (key === 'Escape') {
+                clearDisplay();
+            }
+        });
+    </script>
+</body>
+</html>
