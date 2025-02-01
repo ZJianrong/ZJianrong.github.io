@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>元宵佳节乐团圆</title>
+    <style>
+        body {
+            margin: 0;
+            height: 100vh;
+            background: linear-gradient(#ff6b6b, #ffd93d);
+            font-family: '楷体', cursive;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .container {
+            text-align: center;
+            padding: 20px;
+        }
+
+        .lantern {
+            position: absolute;
+            width: 60px;
+            animation: swing 3s ease-in-out infinite;
+            cursor: pointer;
+        }
+
+        .tangyuan {
+            width: 50px;
+            height: 50px;
+            background: #fff;
+            border-radius: 50%;
+            position: absolute;
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            transition: transform 0.3s;
+        }
+
+        .tangyuan::after {
+            content: '';
+            position: absolute;
+            width: 15px;
+            height: 15px;
+            background: #ff9f9f;
+            border-radius: 50%;
+            top: 15px;
+            left: 20px;
+        }
+
+        .title {
+            color: #fff;
+            text-shadow: 2px 2px 4px #ff4757;
+            font-size: 2.5em;
+            margin: 20px 0;
+        }
+
+        .blessing {
+            position: fixed;
+            bottom: 20px;
+            width: 100%;
+            color: #fff;
+            font-size: 1.2em;
+        }
+
+        @keyframes swing {
+            0%, 100% { transform: rotate(-10deg); }
+            50% { transform: rotate(10deg); }
+        }
+
+        .firework {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background: #fff;
+            border-radius: 50%;
+            animation: explode 1s ease-out;
+        }
+
+        @keyframes explode {
+            0% { transform: scale(1); opacity: 1; }
+            100% { transform: scale(20); opacity: 0; }
+        }
+
+        .glow {
+            filter: drop-shadow(0 0 10px #ffdd59);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="title">🏮 元宵佳节 🏮</h1>
+        
+        <!-- 灯笼 -->
+        <img src="https://img.icons8.com/color/96/000000/lantern.png" 
+             class="lantern" style="top:10%; left:20%">
+        <img src="https://img.icons8.com/color/96/000000/lantern.png" 
+             class="lantern" style="top:15%; right:25%">
+        
+        <!-- 汤圆 -->
+        <div class="tangyuan" style="top:30%; left:40%"></div>
+        <div class="tangyuan" style="top:50%; left:60%"></div>
+        <div class="tangyuan" style="top:70%; left:30%"></div>
+        
+        <!-- 祝福语 -->
+        <div class="blessing" id="blessingText">点击汤圆收获祝福 ❤</div>
+    </div>
+
+    <script>
+        // 灯笼点击效果
+        document.querySelectorAll('.lantern').forEach(lantern => {
+            lantern.addEventListener('click', function() {
+                this.classList.toggle('glow');
+                createFirework(event.clientX, event.clientY);
+            });
+        });
+
+        // 汤圆点击效果
+        document.querySelectorAll('.tangyuan').forEach(tangyuan => {
+            tangyuan.addEventListener('click', function(e) {
+                this.style.transform = 'scale(1.2)';
+                setTimeout(() => this.style.transform = 'scale(1)', 200);
+                
+                const blessings = [
+                    "团团圆圆", "幸福美满", 
+                    "花好月圆", "心想事成",
+                    "阖家欢乐", "平安喜乐"
+                ];
+                
+                const blessing = blessings[Math.floor(Math.random()*blessings.length)];
+                showFloatingBlessing(e.clientX, e.clientY, blessing);
+                createFirework(e.clientX, e.clientY);
+            });
+        });
+
+        function showFloatingBlessing(x, y, text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            div.style.position = 'absolute';
+            div.style.left = x + 'px';
+            div.style.top = y + 'px';
+            div.style.color = '#fff';
+            div.style.animation = 'floatUp 2s ease-out';
+            document.body.appendChild(div);
+            
+            setTimeout(() => div.remove(), 2000);
+        }
+
+        function createFirework(x, y) {
+            const firework = document.createElement('div');
+            firework.className = 'firework';
+            firework.style.left = x + 'px';
+            firework.style.top = y + 'px';
+            document.body.appendChild(firework);
+            
+            setTimeout(() => firework.remove(), 1000);
+        }
+
+        // 添加浮动动画
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes floatUp {
+                0% { transform: translateY(0); opacity: 1; }
+                100% { transform: translateY(-100px); opacity: 0; }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>
