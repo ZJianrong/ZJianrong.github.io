@@ -5,7 +5,102 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>三八妇女节快乐</title>
     <style>
-        /* 保持原有样式不变 */
+        :root {
+            font-size: 14px;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #ff9a9e, #fad0c4);
+            font-family: 'Microsoft YaHei', sans-serif;
+            overflow-x: hidden;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .container {
+            padding: 15px;
+            text-align: center;
+        }
+
+        h1 {
+            color: #fff;
+            font-size: 1.8rem;
+            margin: 1.5rem 0;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            animation: fadeIn 1.5s ease-in;
+        }
+
+        .flowers {
+            position: relative;
+            height: 30vh;
+            margin: 2vh auto;
+        }
+
+        .flower {
+            position: absolute;
+            font-size: 2.5rem;
+            animation: float 3s ease-in-out infinite;
+            user-select: none;
+            transition: transform 0.5s ease;
+        }
+
+        .message {
+            background: rgba(255,255,255,0.95);
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin: 2vh auto;
+            width: 90%;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            line-height: 1.6;
+            font-size: 0.95rem;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
+        }
+
+        .heart {
+            position: absolute;
+            color: #ff4081;
+            font-size: 1.8rem;
+            animation: heartFloat 1.8s ease-out;
+            pointer-events: none;
+        }
+
+        @keyframes heartFloat {
+            0% { opacity: 1; transform: translateY(0); }
+            100% { opacity: 0; transform: translateY(-80px); }
+        }
+
+        @media (max-width: 480px) {
+            :root {
+                font-size: 12px;
+            }
+            h1 {
+                font-size: 1.6rem;
+                margin: 1rem 0;
+            }
+            .message {
+                padding: 1rem;
+                font-size: 0.9rem;
+            }
+            .flower {
+                font-size: 2rem;
+            }
+        }
+
+        @media (min-width: 768px) {
+            :root {
+                font-size: 16px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -26,35 +121,103 @@
     </div>
 
     <script>
-        // 修复后的音乐播放逻辑
+        // 花朵配置
+        const flowers = ['🌸', '🌹', '🌺', '🌷', '🌼', '💮'];
+        const flowersDiv = document.querySelector('.flowers');
+        const flowerSize = 60; // 花朵占位尺寸（像素）
+        let flowerElements = [];
+
+        // 初始化防重叠花朵
+        function createFlowers() {
+            const containerRect = flowersDiv.getBoundingClientRect();
+            const placedPositions = [];
+            
+            for(let i = 0; i < 6; i++) {
+                let left, top, overlap;
+                let attempts = 0;
+
+                do {
+                    overlap = false;
+                    left = Math.random() * (containerRect.width - flowerSize);
+                    top = Math.random() * (containerRect.height - flowerSize);
+
+                    // 碰撞检测
+                    for (const pos of placedPositions) {
+                        const dx = Math.abs(left - pos.x);
+                        const dy = Math.abs(top - pos.y);
+                        if (dx < flowerSize && dy < flowerSize) {
+                            overlap = true;
+                            break;
+                        }
+                    }
+
+                    attempts++;
+                } while (overlap && attempts < 100);
+
+                if (!overlap) {
+                    placedPositions.push({ x: left, y: top });
+
+                    const flower = document.createElement('div');
+                    flower.className = 'flower';
+                    flower.textContent = flowers[Math.floor(Math.random() * flowers.length)];
+                    flower.style.left = `${(left / containerRect.width) * 100}%`;
+                    flower.style.top = `${(top / containerRect.height) * 100}%`;
+                    flowersDiv.appendChild(flower);
+                    flowerElements.push(flower);
+                }
+            }
+        }
+
+        // 更换花朵样式
+        function refreshFlowers() {
+            flowerElements.forEach(flower => {
+                // 随机旋转和缩放
+                flower.style.transform = `rotate(${Math.random() * 360}deg) 
+                    scale(${0.8 + Math.random() * 0.4})`;
+                
+                // 每3次刷新换一次图标
+                if(Math.random() < 0.3) {
+                    flower.textContent = flowers[Math.floor(Math.random() * flowers.length)];
+                }
+            });
+        }
+
+        // 触摸/点击事件处理
+        const isTouchDevice = 'ontouchstart' in window;
         let audio = null;
         let playButton = null;
-        
+
+        // 爱心特效
+        const handleInteraction = (e) => {
+            const x = isTouchDevice ? e.touches[0].clientX : e.clientX;
+            const y = isTouchDevice ? e.touches[0].clientY : e.clientY;
+            
+            const heart = document.createElement('div');
+            heart.className = 'heart';
+            heart.textContent = '❤️';
+            heart.style.left = x + 'px';
+            heart.style.top = y + 'px';
+            document.body.appendChild(heart);
+            setTimeout(() => heart.remove(), 1800);
+        };
+
+        // 音乐播放逻辑
         const initMusic = () => {
-            // 更换为可靠的音乐链接（建议替换为自己的音乐文件）
-            audio = new Audio('https://cdn.pixabay.com/audio/2022/03/08/audio_6b46dd5658.mp3');
+            audio = new Audio('https://cdn.pixabay.com/audio/2023/03/07/audio_7c7d5bdcb4.mp3');
             audio.volume = 0.3;
-            
-            // 预加载音乐
             audio.preload = 'auto';
-            
-            // 统一播放方法
+
             const playAudio = () => {
                 audio.play()
                     .then(() => {
-                        // 播放成功后移除按钮
                         if (playButton) {
                             playButton.remove();
                             playButton = null;
                         }
                     })
-                    .catch((error) => {
-                        console.log('播放失败:', error);
-                        createPlayButton();
-                    });
+                    .catch(() => createPlayButton());
             };
 
-            // 创建播放按钮（单例模式）
             const createPlayButton = () => {
                 if (!playButton) {
                     playButton = document.createElement('button');
@@ -67,33 +230,34 @@
                         background: #ff4081;
                         color: white;
                         font-size: 1rem;
+                        cursor: pointer;
                     `;
-                    playButton.addEventListener('click', () => {
+                    playButton.onclick = () => {
                         playAudio();
-                        playButton.blur(); // 移除点击后的焦点状态
-                    });
+                        playButton.blur();
+                    };
                     document.querySelector('.container').appendChild(playButton);
                 }
             };
 
-            // 用户交互后初始化播放
-            const startPlay = () => {
-                try {
-                    // 尝试自动播放
-                    playAudio();
-                } catch (error) {
-                    createPlayButton();
-                }
-                // 移除事件监听（只执行一次）
-                document.removeEventListener(triggerEvent, startPlay);
-            };
-
-            // 自动检测设备类型
-            const triggerEvent = 'ontouchstart' in window ? 'touchstart' : 'click';
-            document.addEventListener(triggerEvent, startPlay, { once: true });
+            const triggerEvent = isTouchDevice ? 'touchstart' : 'click';
+            document.addEventListener(triggerEvent, () => {
+                playAudio();
+                document.removeEventListener(triggerEvent, playAudio);
+            }, { once: true });
         };
 
-        // 其他原有代码保持不变...
+        // 初始化
+        createFlowers();
+        setInterval(refreshFlowers, 3000); // 每3秒刷新样式
+
+        // 事件绑定
+        if(isTouchDevice) {
+            document.addEventListener('touchstart', handleInteraction);
+        } else {
+            document.addEventListener('click', handleInteraction);
+        }
+
         initMusic();
     </script>
 </body>
