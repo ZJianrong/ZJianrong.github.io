@@ -1,0 +1,1379 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>神话养成记 - 中国神话故事养成游戏</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Microsoft YaHei', sans-serif;
+        }
+        
+        body {
+            background: url('https://img.freepik.com/free-vector/chinese-traditional-background-with-clouds_52683-63845.jpg') no-repeat center center fixed;
+            background-size: cover;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+            margin-top: 20px;
+            margin-bottom: 20px;
+            min-height: 90vh;
+            position: relative;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #d4a017;
+        }
+        
+        h1 {
+            color: #8b0000;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .game-area {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        
+        .character-panel {
+            flex: 1;
+            min-width: 300px;
+            background-color: rgba(255, 248, 220, 0.8);
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .story-panel {
+            flex: 2;
+            min-width: 400px;
+            background-color: rgba(245, 245, 245, 0.8);
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            max-height: 500px;
+            overflow-y: auto;
+        }
+        
+        .character-image {
+            width: 150px;
+            height: 150px;
+            margin: 0 auto 20px;
+            display: block;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid #d4a017;
+        }
+        
+        .stats {
+            margin-bottom: 20px;
+        }
+        
+        .stat-item {
+            margin-bottom: 10px;
+        }
+        
+        .stat-name {
+            font-weight: bold;
+            display: inline-block;
+            width: 100px;
+        }
+        
+        .stat-bar {
+            height: 15px;
+            background-color: #e0e0e0;
+            border-radius: 10px;
+            overflow: hidden;
+            display: inline-block;
+            width: calc(100% - 110px);
+        }
+        
+        .stat-fill {
+            height: 100%;
+            background-color: #8b0000;
+            border-radius: 10px;
+            transition: width 0.5s ease;
+        }
+        
+        .actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        button {
+            background-color: #d4a017;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            font-weight: bold;
+        }
+        
+        button:hover {
+            background-color: #8b0000;
+        }
+        
+        button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+        
+        .story-content {
+            margin-bottom: 20px;
+            line-height: 1.8;
+            text-align: justify;
+        }
+        
+        .story-options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .story-option {
+            background-color: #f0f0f0;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            border-left: 3px solid #d4a017;
+        }
+        
+        .story-option:hover {
+            background-color: #e0e0e0;
+            border-left-color: #8b0000;
+        }
+        
+        .inventory {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #d4a017;
+        }
+        
+        .inventory-items {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .inventory-item {
+            background-color: #f0f0f0;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 0.9em;
+            border: 1px solid #d4a017;
+        }
+        
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: rgba(139, 0, 0, 0.9);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+            transform: translateX(200%);
+            transition: transform 0.3s ease;
+        }
+        
+        .notification.show {
+            transform: translateX(0);
+        }
+        
+        .story-title {
+            color: #8b0000;
+            margin-bottom: 15px;
+            border-bottom: 1px solid #d4a017;
+            padding-bottom: 10px;
+        }
+        
+        .task-list {
+            margin-top: 20px;
+        }
+        
+        .task-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            padding: 8px;
+            background-color: rgba(255, 255, 255, 0.7);
+            border-radius: 5px;
+        }
+        
+        .task-checkbox {
+            margin-right: 10px;
+        }
+        
+        .task-complete {
+            text-decoration: line-through;
+            color: #888;
+        }
+        
+        .game-menu {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+        }
+        
+        .menu-button {
+            background-color: transparent;
+            color: #8b0000;
+            border: 1px solid #8b0000;
+            padding: 5px 10px;
+            font-size: 0.9em;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal-content {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            max-width: 600px;
+            width: 80%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        
+        .close-modal {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 1.5em;
+            cursor: pointer;
+            color: #8b0000;
+        }
+        
+        .story-selector {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        
+        .story-card {
+            width: 200px;
+            background-color: rgba(255, 248, 220, 0.9);
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .story-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .story-card img {
+            width: 100%;
+            height: 120px;
+            object-fit: cover;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+        
+        .story-card h3 {
+            color: #8b0000;
+            margin-bottom: 5px;
+        }
+        
+        .story-card p {
+            font-size: 0.9em;
+            color: #666;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+                margin-top: 10px;
+                margin-bottom: 10px;
+            }
+            
+            h1 {
+                font-size: 2em;
+            }
+            
+            .game-area {
+                flex-direction: column;
+            }
+            
+            .character-panel, .story-panel {
+                width: 100%;
+                min-width: unset;
+            }
+            
+            .story-panel {
+                max-height: none;
+            }
+            
+            .actions {
+                justify-content: center;
+            }
+            
+            button {
+                padding: 12px 20px;
+                font-size: 1.1em;
+            }
+            
+            .story-card {
+                width: 100%;
+                max-width: 300px;
+            }
+            
+            .modal-content {
+                width: 95%;
+                padding: 20px;
+            }
+            
+            .notification {
+                width: 90%;
+                left: 50%;
+                transform: translateX(-50%);
+                right: auto;
+            }
+            
+            .notification.show {
+                transform: translateX(-50%);
+            }
+        }
+        
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 1.8em;
+            }
+            
+            .character-panel, .story-panel {
+                padding: 15px;
+            }
+            
+            .character-image {
+                width: 120px;
+                height: 120px;
+            }
+            
+            .stat-name {
+                width: 80px;
+            }
+            
+            .stat-bar {
+                width: calc(100% - 90px);
+            }
+            
+            .actions {
+                flex-direction: column;
+            }
+            
+            button {
+                width: 100%;
+            }
+            
+            .inventory-items {
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>神话养成记</h1>
+            <p>踏上神话之旅，培养你的神话英雄</p>
+        </header>
+        
+        <div class="game-menu">
+            <button id="menuButton" class="menu-button">菜单</button>
+        </div>
+        
+        <div id="storySelector" class="story-selector">
+            <div class="story-card" data-story="pangu">
+                <img src="https://img.freepik.com/free-vector/hand-drawn-flat-design-chinese-new-year-illustration_23-2149137175.jpg" alt="盘古开天辟地">
+                <h3>盘古开天辟地</h3>
+                <p>成为开天辟地的神话英雄，塑造世界的雏形</p>
+            </div>
+            <div class="story-card" data-story="nvwa">
+                <img src="https://img.freepik.com/free-vector/hand-drawn-chinese-new-year-illustration_23-2149137174.jpg" alt="女娲造人">
+                <h3>女娲造人</h3>
+                <p>学习女娲的智慧，创造生命的奇迹</p>
+            </div>
+            <div class="story-card" data-story="houyi">
+                <img src="https://img.freepik.com/free-vector/hand-drawn-chinese-new-year-illustration_23-2149137173.jpg" alt="后羿射日">
+                <h3>后羿射日</h3>
+                <p>成为神射手后羿，拯救世界于水深火热之中</p>
+            </div>
+        </div>
+        
+        <div id="gameArea" class="game-area" style="display: none;">
+            <div class="character-panel">
+                <img id="characterImage" class="character-image" src="" alt="角色形象">
+                <h2 id="characterName">角色名称</h2>
+                <div class="stats">
+                    <div class="stat-item">
+                        <span class="stat-name">力量:</span>
+                        <div class="stat-bar">
+                            <div id="strengthBar" class="stat-fill" style="width: 20%;"></div>
+                        </div>
+                        <span id="strengthValue">20</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-name">智慧:</span>
+                        <div class="stat-bar">
+                            <div id="wisdomBar" class="stat-fill" style="width: 20%;"></div>
+                        </div>
+                        <span id="wisdomValue">20</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-name">耐力:</span>
+                        <div class="stat-bar">
+                            <div id="enduranceBar" class="stat-fill" style="width: 20%;"></div>
+                        </div>
+                        <span id="enduranceValue">20</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-name">魅力:</span>
+                        <div class="stat-bar">
+                            <div id="charismaBar" class="stat-fill" style="width: 20%;"></div>
+                        </div>
+                        <span id="charismaValue">20</span>
+                    </div>
+                </div>
+                
+                <div class="actions">
+                    <button id="trainStrength">训练力量</button>
+                    <button id="studyWisdom">学习智慧</button>
+                    <button id="practiceEndurance">锻炼耐力</button>
+                    <button id="developCharisma">提升魅力</button>
+                </div>
+                
+                <div class="inventory">
+                    <h3>物品栏</h3>
+                    <div id="inventoryItems" class="inventory-items">
+                        <!-- 物品将在这里显示 -->
+                    </div>
+                </div>
+            </div>
+            
+            <div class="story-panel">
+                <h3 id="storyTitle" class="story-title">故事标题</h3>
+                <div id="storyContent" class="story-content">
+                    <!-- 故事内容将在这里显示 -->
+                </div>
+                <div id="storyOptions" class="story-options">
+                    <!-- 故事选项将在这里显示 -->
+                </div>
+                
+                <div class="task-list">
+                    <h3>任务</h3>
+                    <div id="taskItems">
+                        <!-- 任务将在这里显示 -->
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div id="menuModal" class="modal">
+            <div class="modal-content">
+                <span class="close-modal">&times;</span>
+                <h2>游戏菜单</h2>
+                <button id="saveGame">保存游戏</button>
+                <button id="loadGame">加载游戏</button>
+                <button id="resetGame">重置游戏</button>
+                <button id="returnToSelector">返回故事选择</button>
+            </div>
+        </div>
+        
+        <div id="notification" class="notification">通知内容</div>
+    </div>
+    
+    <script>
+        // 游戏数据
+        const gameData = {
+            pangu: {
+                name: "盘古",
+                image: "https://img.freepik.com/free-vector/hand-drawn-flat-design-chinese-new-year-illustration_23-2149137175.jpg",
+                stats: {
+                    strength: 30,
+                    wisdom: 20,
+                    endurance: 40,
+                    charisma: 10
+                },
+                inventory: [],
+                story: {
+                    current: "start",
+                    scenes: {
+                        start: {
+                            title: "混沌初开",
+                            content: "太初之时，天地混沌如鸡子。盘古生其中，万劫不死。天地开辟，阴阳分离。你感受到自己体内蕴含着巨大的力量，但尚未掌握如何运用。",
+                            options: [
+                                { text: "尝试分开天地", next: "separate_heaven_earth", requires: { strength: 40 } },
+                                { text: "冥想感受混沌之力", next: "meditate", requires: { wisdom: 30 } },
+                                { text: "锻炼自己的身体", next: "train_body", requires: {} }
+                            ]
+                        },
+                        separate_heaven_earth: {
+                            title: "开天辟地",
+                            content: "你集中全身力量，奋力向上撑起天空，向下踏实大地。只听一声巨响，天地分开了！你成功地将天地分离，成为了真正的开天辟地之神。",
+                            options: [
+                                { text: "支撑天地不塌陷", next: "support_heaven", requires: { endurance: 50 } },
+                                { text: "创造日月星辰", next: "create_celestial", requires: { wisdom: 40 } }
+                            ],
+                            rewards: [
+                                { type: "item", id: "creation_axe", name: "开天斧" },
+                                { type: "stat", stat: "strength", value: 10 }
+                            ]
+                        },
+                        meditate: {
+                            title: "感悟混沌",
+                            content: "你静心冥想，感受混沌中的奥秘。渐渐地，你开始理解阴阳之道，明白了天地运行的规律。",
+                            options: [
+                                { text: "尝试分开天地", next: "separate_heaven_earth", requires: { strength: 35 } },
+                                { text: "继续深入感悟", next: "deep_meditation", requires: { wisdom: 40 } }
+                            ],
+                            rewards: [
+                                { type: "stat", stat: "wisdom", value: 15 }
+                            ]
+                        },
+                        train_body: {
+                            title: "锻炼身体",
+                            content: "你在混沌中不断锻炼自己的身体，感到力量在不断增强。你的身体变得越来越加强，足以承担开天辟地的重任。",
+                            options: [
+                                { text: "尝试分开天地", next: "separate_heaven_earth", requires: { strength: 35 } },
+                                { text: "继续锻炼", next: "continue_training", requires: {} }
+                            ],
+                            rewards: [
+                                { type: "stat", stat: "strength", value: 15 },
+                                { type: "stat", stat: "endurance", value: 10 }
+                            ]
+                        },
+                        support_heaven: {
+                            title: "顶天立地",
+                            content: "你用尽全力支撑着天地，确保它们不会再次合拢。日复一日，年复一年，你的身体逐渐化为天地万物，你的呼吸成为风，你的眼睛成为日月，你的血液成为江河...",
+                            options: [
+                                { text: "完成使命，化身万物", next: "transform", requires: {} }
+                            ],
+                            rewards: [
+                                { type: "item", id: "pangu_essence", name: "盘古精华" },
+                                { type: "stat", stat: "endurance", value: 20 }
+                            ]
+                        },
+                        create_celestial: {
+                            title: "创造日月星辰",
+                            content: "你运用智慧，从混沌中分离出光明与黑暗，创造出日月星辰。天空变得璀璨夺目，大地也有了昼夜交替。",
+                            options: [
+                                { text: "继续完善天地", next: "perfect_world", requires: { wisdom: 50 } },
+                                { text: "支撑天地不塌陷", next: "support_heaven", requires: { endurance: 45 } }
+                            ],
+                            rewards: [
+                                { type: "item", id: "sun_essence", name: "太阳精华" },
+                                { type: "item", id: "moon_essence", name: "月亮精华" },
+                                { type: "stat", stat: "wisdom", value: 15 }
+                            ]
+                        },
+                        transform: {
+                            title: "化身万物",
+                            content: "你完成了开天辟地的伟大使命，你的身体化为了天地万物，永远地融入了这个世界。你的精神将永远被后人铭记，作为开天辟地的伟大神祇。",
+                            options: [
+                                { text: "重新开始", next: "restart", requires: {} }
+                            ],
+                            rewards: [
+                                { type: "completion", story: "pangu" }
+                            ]
+                        }
+                    }
+                },
+                tasks: [
+                    { id: "separate_heaven_earth", text: "分开天地", completed: false, requires: { scene: "separate_heaven_earth" } },
+                    { id: "create_celestial", text: "创造日月星辰", completed: false, requires: { scene: "create_celestial" } },
+                    { id: "transform", text: "化身万物", completed: false, requires: { scene: "transform" } }
+                ]
+            },
+            nvwa: {
+                name: "女娲",
+                image: "https://img.freepik.com/free-vector/hand-drawn-chinese-new-year-illustration_23-2149137174.jpg",
+                stats: {
+                    strength: 15,
+                    wisdom: 40,
+                    endurance: 25,
+                    charisma: 30
+                },
+                inventory: [],
+                story: {
+                    current: "start",
+                    scenes: {
+                        start: {
+                            title: "孤独的世界",
+                            content: "天地已开，万物已生，但世界依然空旷寂寥。你是女娲，天地间少有的神祇之一。你感到深深的孤独，希望创造更多生命来丰富这个世界。",
+                            options: [
+                                { text: "尝试用泥土捏造生命", next: "create_humans", requires: { wisdom: 45 } },
+                                { text: "探索世界寻找灵感", next: "explore_world", requires: {} },
+                                { text: "冥想思考生命的本质", next: "meditate_life", requires: { wisdom: 35 } }
+                            ]
+                        },
+                        create_humans: {
+                            title: "造人",
+                            content: "你取来黄河岸边的泥土，按照自己的样子开始捏造人形。神奇的是，这些泥人竟然有了生命，能够行走说话！你欣喜若狂，决定创造更多。",
+                            options: [
+                                { text: "大规模造人", next: "mass_creation", requires: { endurance: 35 } },
+                                { text: "教导人类生存技能", next: "teach_humans", requires: { charisma: 40 } }
+                            ],
+                            rewards: [
+                                { type: "item", id: "creation_clay", name: "造人泥土" },
+                                { type: "stat", stat: "wisdom", value: 10 }
+                            ]
+                        },
+                        explore_world: {
+                            title: "探索世界",
+                            content: "你游历天地之间，观察各种自然现象和已有的生灵。这次探索让你对生命有了更深的理解，也积累了创造生命的灵感。",
+                            options: [
+                                { text: "尝试用泥土捏造生命", next: "create_humans", requires: { wisdom: 40 } },
+                                { text: "继续探索", next: "further_exploration", requires: {} }
+                            ],
+                            rewards: [
+                                { type: "stat", stat: "wisdom", value: 10 },
+                                { type: "stat", stat: "endurance", value: 5 }
+                            ]
+                        },
+                        meditate_life: {
+                            title: "生命的本质",
+                            content: "通过冥想，你领悟到生命的本质在于灵魂与形体的结合。你明白了如何将灵气注入物质，赋予其生命。",
+                            options: [
+                                { text: "尝试用泥土捏造生命", next: "create_humans", requires: { wisdom: 40 } },
+                                { text: "尝试其他材料创造生命", next: "alternative_creation", requires: { wisdom: 50 } }
+                            ],
+                            rewards: [
+                                { type: "stat", stat: "wisdom", value: 15 }
+                            ]
+                        },
+                        mass_creation: {
+                            title: "大规模造人",
+                            content: "你发明了一种更高效的造人方法：用绳子蘸泥甩出，每一滴落地的泥点都变成了一个人。很快，大地上有了成千上万的人类。",
+                            options: [
+                                { text: "教导人类生存技能", next: "teach_humans", requires: { charisma: 35 } },
+                                { text: "为人类建立秩序", next: "establish_order", requires: { wisdom: 55 } }
+                            ],
+                            rewards: [
+                                { type: "item", id: "creation_rope", name: "造人绳" },
+                                { type: "stat", stat: "endurance", value: 10 }
+                            ]
+                        },
+                        teach_humans: {
+                            title: "人类的导师",
+                            content: "你教导人类如何耕种、狩猎、建造房屋和制作工具。人类在你的指导下迅速发展，开始形成部落和村庄。",
+                            options: [
+                                { text: "为人类建立婚姻制度", next: "establish_marriage", requires: { charisma: 50 } },
+                                { text: "为人类建立秩序", next: "establish_order", requires: { wisdom: 50 } }
+                            ],
+                            rewards: [
+                                { type: "stat", stat: "charisma", value: 15 },
+                                { type: "item", id: "teaching_scroll", name: "教导卷轴" }
+                            ]
+                        },
+                        establish_marriage: {
+                            title: "婚姻的缔造者",
+                            content: "你看到人类需要伴侣和家庭，于是创立了婚姻制度，教导人类组建家庭，繁衍后代。人类社会变得更加和谐稳定。",
+                            options: [
+                                { text: "完善人类社会制度", next: "perfect_society", requires: { wisdom: 55 } },
+                                { text: "修补天穹", next: "repair_sky", requires: { strength: 40 } }
+                            ],
+                            rewards: [
+                                { type: "item", id: "marriage_ribbon", name: "姻缘红绳" }
+                            ]
+                        },
+                        repair_sky: {
+                            title: "补天",
+                            content: "一场大灾难发生了，共工怒撞不周山，天穹破碎，洪水泛滥。你决心修补天空，拯救人类。你熔炼五彩石，补上了天空的裂缝，又平息了洪水。",
+                            options: [
+                                { text: "完成使命，成为人类守护神", next: "become_guardian", requires: {} }
+                            ],
+                            rewards: [
+                                { type: "item", id: "colorful_stone", name: "五彩石" },
+                                { type: "stat", stat: "strength", value: 20 },
+                                { type: "stat", stat: "wisdom", value: 15 }
+                            ]
+                        },
+                        become_guardian: {
+                            title: "人类的守护神",
+                            content: "你成功地创造了人类，教导他们生存技能，建立了社会制度，还拯救了他们免于灭顶之灾。人类尊你为造人补天的伟大女神，世世代代祭祀膜拜。你成为了人类永恒的守护神。",
+                            options: [
+                                { text: "重新开始", next: "restart", requires: {} }
+                            ],
+                            rewards: [
+                                { type: "completion", story: "nvwa" }
+                            ]
+                        }
+                    }
+                },
+                tasks: [
+                    { id: "create_humans", text: "创造人类", completed: false, requires: { scene: "create_humans" } },
+                    { id: "teach_humans", text: "教导人类", completed: false, requires: { scene: "teach_humans" } },
+                    { id: "repair_sky", text: "补天", completed: false, requires: { scene: "repair_sky" } }
+                ]
+            },
+            houyi: {
+                name: "后羿",
+                image: "https://img.freepik.com/free-vector/hand-drawn-chinese-new-year-illustration_23-2149137173.jpg",
+                stats: {
+                    strength: 35,
+                    wisdom: 25,
+                    endurance: 30,
+                    charisma: 20
+                },
+                inventory: [],
+                story: {
+                    current: "start",
+                    scenes: {
+                        start: {
+                            title: "天庭神射手",
+                            content: "你是后羿，天庭的神射手，箭术无人能敌。你生活在天庭，为玉帝效力，但你对天庭的一些规矩感到不满。",
+                            options: [
+                                { text: "继续忠诚地为天庭效力", next: "loyal_service", requires: {} },
+                                { text: "质疑天庭的决定", next: "question_heaven", requires: { wisdom: 30 } },
+                                { text: "磨练箭术", next: "practice_archery", requires: {} }
+                            ]
+                        },
+                        loyal_service: {
+                            title: "忠诚的神射手",
+                            content: "你继续忠诚地为天庭效力，完成各种任务。有一天，玉帝召见你，告诉你一个紧急情况：十日同时出现在天空，导致大地干旱，生灵涂炭。",
+                            options: [
+                                { text: "接受射日任务", next: "accept_mission", requires: {} },
+                                { text: "建议寻找其他解决方案", next: "suggest_alternative", requires: { wisdom: 40 } }
+                            ],
+                            rewards: [
+                                { type: "stat", stat: "charisma", value: 10 }
+                            ]
+                        },
+                        question_heaven: {
+                            title: "质疑天规",
+                            content: "你开始质疑天庭的一些决定，认为某些规定对凡间百姓不公。这引起了一些神仙的不满，但也有支持你的声音。就在这时，十日同时出现在天空，导致大地干旱。",
+                            options: [
+                                { text: "主动请缨射日", next: "volunteer_mission", requires: { strength: 40 } },
+                                { text: "先尝试与日神沟通", next: "negotiate_suns", requires: { charisma: 35 } }
+                            ],
+                            rewards: [
+                                { type: "stat", stat: "wisdom", value: 10 }
+                            ]
+                        },
+                        practice_archery: {
+                            title: "箭术精进",
+                            content: "你不断磨练自己的箭术，达到了前所未有的境界。你能够百发百中，甚至能射中极远处的目标。就在你箭术大成之际，十日同时出现在天空，导致大地干旱。",
+                            options: [
+                                { text: "主动请缨射日", next: "volunteer_mission", requires: {} },
+                                { text: "先向天庭请示", next: "ask_permission", requires: { charisma: 30 } }
+                            ],
+                            rewards: [
+                                { type: "stat", stat: "strength", value: 15 },
+                                { type: "item", id: "master_bow", name: "神射之弓" }
+                            ]
+                        },
+                        accept_mission: {
+                            title: "接受使命",
+                            content: "你接受了射日的任务，带着神弓神箭来到凡间。你看到大地干裂，河流干涸，人们饱受干旱之苦，决心完成任务。",
+                            options: [
+                                { text: "射下九个太阳", next: "shoot_nine_suns", requires: { strength: 45 } },
+                                { text: "先射下部分太阳观察效果", next: "shoot_some_suns", requires: { wisdom: 35 } }
+                            ],
+                            rewards: [
+                                { type: "item", id: "divine_bow", name: "天帝之弓" },
+                                { type: "item", id: "divine_arrows", name: "神箭" }
+                            ]
+                        },
+                        shoot_nine_suns: {
+                            title: "射日英雄",
+                            content: "你拉开神弓，连射九箭，精准地射下了九个太阳。天空只剩下一个太阳，大地重获生机。你成为了凡间百姓手中的英雄，但天庭却对你的行为感到震怒。",
+                            options: [
+                                { text: "接受天庭惩罚", next: "accept_punishment", requires: { endurance: 40 } },
+                                { text: "留在人间", next: "stay_mortal", requires: {} }
+                            ],
+                            rewards: [
+                                { type: "stat", stat: "strength", value: 10 },
+                                { type: "stat", stat: "charisma", value: 15 },
+                                { type: "item", id: "sun_essence", name: "太阳精华" }
+                            ]
+                        },
+                        stay_mortal: {
+                            title: "凡间的英雄",
+                            content: "你决定留在人间，与普通人一起生活。你娶了美丽善良的嫦娥为妻，过上了平静的生活。你的箭术仍然无人能敌，经常帮助百姓除害解难。",
+                            options: [
+                                { text: "寻找长生不老药", next: "seek_immortality", requires: { wisdom: 45 } },
+                                { text: "安心过普通生活", next: "normal_life", requires: {} }
+                            ],
+                            rewards: [
+                                { type: "item", id: "mortal_home", name: "人间住所" }
+                            ]
+                        },
+                        seek_immortality: {
+                            title: "寻找不死药",
+                            content: "你开始寻找传说中的长生不老药，希望能与妻子嫦娥永远在一起。经过千辛万苦，你从西王母那里获得了不死药。然而，意外发生了...",
+                            options: [
+                                { text: "完成故事", next: "complete_story", requires: {} }
+                            ],
+                            rewards: [
+                                { type: "item", id: "immortality_elixir", name: "不死药" }
+                            ]
+                        },
+                        complete_story: {
+                            title: "射日英雄的传说",
+                            content: "在你外出打猎时，嫦娥为保护不死药免遭恶人抢夺，吞下了药丸，飞向月亮成为了月神。你失去了挚爱，但你的英雄事迹和悲情故事流传千古。你被后人尊为射日英雄，每年中秋，人们都会仰望明月，思念嫦娥，也缅怀你的伟大。",
+                            options: [
+                                { text: "重新开始", next: "restart", requires: {} }
+                            ],
+                            rewards: [
+                                { type: "completion", story: "houyi" }
+                            ]
+                        }
+                    }
+                },
+                tasks: [
+                    { id: "shoot_suns", text: "射日", completed: false, requires: { scene: "shoot_nine_suns" } },
+                    { id: "stay_mortal", text: "留在人间", completed: false, requires: { scene: "stay_mortal" } },
+                    { id: "seek_immortality", text: "寻找不死药", completed: false, requires: { scene: "seek_immortality" } }
+                ]
+            }
+        };
+        
+        // 游戏状态
+        let currentStory = null;
+        let character = null;
+        let saveData = {};
+        
+        // DOM元素
+        const storySelector = document.getElementById('storySelector');
+        const gameArea = document.getElementById('gameArea');
+        const characterImage = document.getElementById('characterImage');
+        const characterName = document.getElementById('characterName');
+        const strengthBar = document.getElementById('strengthBar');
+        const strengthValue = document.getElementById('strengthValue');
+        const wisdomBar = document.getElementById('wisdomBar');
+        const wisdomValue = document.getElementById('wisdomValue');
+        const enduranceBar = document.getElementById('enduranceBar');
+        const enduranceValue = document.getElementById('enduranceValue');
+        const charismaBar = document.getElementById('charismaBar');
+        const charismaValue = document.getElementById('charismaValue');
+        const inventoryItems = document.getElementById('inventoryItems');
+        const storyTitle = document.getElementById('storyTitle');
+        const storyContent = document.getElementById('storyContent');
+        const storyOptions = document.getElementById('storyOptions');
+        const taskItems = document.getElementById('taskItems');
+        const menuModal = document.getElementById('menuModal');
+        const notification = document.getElementById('notification');
+        
+        // 初始化游戏
+        function initGame() {
+            // 添加故事卡片点击事件
+            const storyCards = document.querySelectorAll('.story-card');
+            storyCards.forEach(card => {
+                card.addEventListener('click', () => {
+                    const storyId = card.getAttribute('data-story');
+                    startStory(storyId);
+                });
+            });
+            
+            // 添加训练按钮事件
+            document.getElementById('trainStrength').addEventListener('click', () => trainStat('strength', 5));
+            document.getElementById('studyWisdom').addEventListener('click', () => trainStat('wisdom', 5));
+            document.getElementById('practiceEndurance').addEventListener('click', () => trainStat('endurance', 5));
+            document.getElementById('developCharisma').addEventListener('click', () => trainStat('charisma', 5));
+            
+            // 菜单按钮事件
+            document.getElementById('menuButton').addEventListener('click', toggleMenu);
+            document.querySelector('.close-modal').addEventListener('click', toggleMenu);
+            
+            // 菜单选项事件
+            document.getElementById('saveGame').addEventListener('click', saveGame);
+            document.getElementById('loadGame').addEventListener('click', loadGame);
+            document.getElementById('resetGame').addEventListener('click', resetGame);
+            document.getElementById('returnToSelector').addEventListener('click', returnToSelector);
+            
+            // 加载存档
+            loadSaveData();
+        }
+        
+        // 开始故事
+        function startStory(storyId) {
+            currentStory = storyId;
+            character = JSON.parse(JSON.stringify(gameData[storyId]));
+            
+            // 显示游戏界面
+            storySelector.style.display = 'none';
+            gameArea.style.display = 'flex';
+            
+            // 更新角色信息
+            updateCharacterInfo();
+            
+            // 加载当前场景
+            loadScene(character.story.current);
+            
+            // 更新任务列表
+            updateTasks();
+            
+            // 保存游戏
+            saveGame();
+        }
+        
+        // 更新角色信息
+        function updateCharacterInfo() {
+            characterImage.src = character.image;
+            characterName.textContent = character.name;
+            
+            // 更新属性条
+            updateStatBar('strength', character.stats.strength);
+            updateStatBar('wisdom', character.stats.wisdom);
+            updateStatBar('endurance', character.stats.endurance);
+            updateStatBar('charisma', character.stats.charisma);
+            
+            // 更新物品栏
+            updateInventory();
+        }
+        
+        // 更新属性条
+        function updateStatBar(stat, value) {
+            const bar = document.getElementById(`${stat}Bar`);
+            const valueElement = document.getElementById(`${stat}Value`);
+            
+            // 限制属性值在0-100之间
+            value = Math.max(0, Math.min(100, value));
+            character.stats[stat] = value;
+            
+            // 更新UI
+            bar.style.width = `${value}%`;
+            valueElement.textContent = value;
+        }
+        
+        // 训练属性
+        function trainStat(stat, amount) {
+            const currentValue = character.stats[stat];
+            updateStatBar(stat, currentValue + amount);
+            
+            // 显示通知
+            showNotification(`${stat.charAt(0).toUpperCase() + stat.slice(1)} 增加了 ${amount} 点！`);
+            
+            // 检查是否解锁新选项
+            checkStoryOptions();
+            
+            // 保存游戏
+            saveGame();
+        }
+        
+        // 加载场景
+        function loadScene(sceneId) {
+            if (sceneId === 'restart') {
+                returnToSelector();
+                return;
+            }
+            
+            const scene = character.story.scenes[sceneId];
+            character.story.current = sceneId;
+            
+            // 更新场景标题和内容
+            storyTitle.textContent = scene.title;
+            storyContent.textContent = scene.content;
+            
+            // 清空选项
+            storyOptions.innerHTML = '';
+            
+            // 添加新选项
+            scene.options.forEach(option => {
+                const optionElement = document.createElement('div');
+                optionElement.className = 'story-option';
+                optionElement.textContent = option.text;
+                
+                // 检查是否满足要求
+                let meetsRequirements = true;
+                for (const [stat, requiredValue] of Object.entries(option.requires)) {
+                    if (character.stats[stat] < requiredValue) {
+                        meetsRequirements = false;
+                        break;
+                    }
+                }
+                
+                if (!meetsRequirements) {
+                    optionElement.style.opacity = '0.5';
+                    optionElement.style.cursor = 'not-allowed';
+                    
+                    // 添加要求提示
+                    let requirementsText = '需要: ';
+                    for (const [stat, requiredValue] of Object.entries(option.requires)) {
+                        requirementsText += `${stat.charAt(0).toUpperCase() + stat.slice(1)} ${requiredValue}, `;
+                    }
+                    requirementsText = requirementsText.slice(0, -2);
+                    
+                    const requirementsElement = document.createElement('div');
+                    requirementsElement.style.fontSize = '0.8em';
+                    requirementsElement.style.color = '#8b0000';
+                    requirementsElement.textContent = requirementsText;
+                    optionElement.appendChild(requirementsElement);
+                } else {
+                    // 添加点击事件
+                    optionElement.addEventListener('click', () => {
+                        selectOption(option.next);
+                    });
+                }
+                
+                storyOptions.appendChild(optionElement);
+            });
+            
+            // 处理奖励
+            if (scene.rewards) {
+                processRewards(scene.rewards);
+            }
+            
+            // 更新任务
+            updateTasks();
+            
+            // 保存游戏
+            saveGame();
+        }
+        
+        // 选择选项
+        function selectOption(nextSceneId) {
+            loadScene(nextSceneId);
+        }
+        
+        // 处理奖励
+        function processRewards(rewards) {
+            rewards.forEach(reward => {
+                switch (reward.type) {
+                    case 'item':
+                        // 添加物品到物品栏
+                        character.inventory.push({
+                            id: reward.id,
+                            name: reward.name
+                        });
+                        showNotification(`获得物品: ${reward.name}`);
+                        break;
+                    case 'stat':
+                        // 增加属性值
+                        const currentValue = character.stats[reward.stat];
+                        updateStatBar(reward.stat, currentValue + reward.value);
+                        showNotification(`${reward.stat.charAt(0).toUpperCase() + reward.stat.slice(1)} 增加了 ${reward.value} 点！`);
+                        break;
+                    case 'completion':
+                        // 完成故事
+                        showNotification(`恭喜！你完成了 ${character.name} 的故事！`);
+                        break;
+                }
+            });
+            
+            // 更新物品栏
+            updateInventory();
+        }
+        
+        // 更新物品栏
+        function updateInventory() {
+            inventoryItems.innerHTML = '';
+            
+            if (character.inventory.length === 0) {
+                const emptyItem = document.createElement('div');
+                emptyItem.className = 'inventory-item';
+                emptyItem.textContent = '空';
+                inventoryItems.appendChild(emptyItem);
+                return;
+            }
+            
+            character.inventory.forEach(item => {
+                const itemElement = document.createElement('div');
+                itemElement.className = 'inventory-item';
+                itemElement.textContent = item.name;
+                inventoryItems.appendChild(itemElement);
+            });
+        }
+        
+        // 更新任务列表
+        function updateTasks() {
+            taskItems.innerHTML = '';
+            
+            character.tasks.forEach(task => {
+                // 检查任务是否应该完成
+                if (!task.completed && task.requires.scene === character.story.current) {
+                    task.completed = true;
+                }
+                
+                const taskElement = document.createElement('div');
+                taskElement.className = 'task-item' + (task.completed ? ' task-complete' : '');
+                
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.className = 'task-checkbox';
+                checkbox.checked = task.completed;
+                checkbox.disabled = true;
+                
+                const taskText = document.createElement('span');
+                taskText.textContent = task.text;
+                
+                taskElement.appendChild(checkbox);
+                taskElement.appendChild(taskText);
+                taskItems.appendChild(taskElement);
+            });
+        }
+        
+        // 检查故事选项
+        function checkStoryOptions() {
+            const scene = character.story.scenes[character.story.current];
+            const optionElements = document.querySelectorAll('.story-option');
+            
+            scene.options.forEach((option, index) => {
+                let meetsRequirements = true;
+                for (const [stat, requiredValue] of Object.entries(option.requires)) {
+                    if (character.stats[stat] < requiredValue) {
+                        meetsRequirements = false;
+                        break;
+                    }
+                }
+                
+                if (meetsRequirements && optionElements[index].style.opacity === '0.5') {
+                    // 更新选项样式
+                    optionElements[index].style.opacity = '1';
+                    optionElements[index].style.cursor = 'pointer';
+                    
+                    // 移除要求提示
+                    if (optionElements[index].lastChild !== optionElements[index].firstChild) {
+                        optionElements[index].removeChild(optionElements[index].lastChild);
+                    }
+                    
+                    // 添加点击事件
+                    optionElements[index].addEventListener('click', () => {
+                        selectOption(option.next);
+                    });
+                    
+                    showNotification('新的选项已解锁！');
+                }
+            });
+        }
+        
+        // 显示通知
+        function showNotification(message) {
+            notification.textContent = message;
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+        
+        // 切换菜单
+        function toggleMenu() {
+            if (menuModal.style.display === 'flex') {
+                menuModal.style.display = 'none';
+            } else {
+                menuModal.style.display = 'flex';
+            }
+        }
+        
+        // 保存游戏
+        function saveGame() {
+            if (!currentStory || !character) return;
+            
+            saveData[currentStory] = JSON.parse(JSON.stringify(character));
+            localStorage.setItem('mythologyGame', JSON.stringify(saveData));
+            
+            if (menuModal.style.display === 'flex') {
+                showNotification('游戏已保存');
+                toggleMenu();
+            }
+        }
+        
+        // 加载游戏
+        function loadGame() {
+            if (!currentStory) {
+                // 检查是否有存档
+                loadSaveData();
+                if (Object.keys(saveData).length > 0) {
+                    // 使用第一个存档
+                    const firstStory = Object.keys(saveData)[0];
+                    currentStory = firstStory;
+                    character = saveData[firstStory];
+                    
+                    // 显示游戏界面
+                    storySelector.style.display = 'none';
+                    gameArea.style.display = 'flex';
+                    
+                    // 更新角色信息
+                    updateCharacterInfo();
+                    
+                    // 加载当前场景
+                    loadScene(character.story.current);
+                    
+                    // 更新任务列表
+                    updateTasks();
+                    
+                    showNotification('游戏已加载');
+                } else {
+                    showNotification('没有找到存档');
+                }
+            } else {
+                // 加载当前故事的存档
+                if (saveData[currentStory]) {
+                    character = saveData[currentStory];
+                    
+                    // 更新角色信息
+                    updateCharacterInfo();
+                    
+                    // 加载当前场景
+                    loadScene(character.story.current);
+                    
+                    // 更新任务列表
+                    updateTasks();
+                    
+                    showNotification('游戏已加载');
+                } else {
+                    showNotification('没有找到存档');
+                }
+            }
+            
+            if (menuModal.style.display === 'flex') {
+                toggleMenu();
+            }
+        }
+        
+        // 重置游戏
+        function resetGame() {
+            if (!currentStory) return;
+            
+            character = JSON.parse(JSON.stringify(gameData[currentStory]));
+            
+            // 更新角色信息
+            updateCharacterInfo();
+            
+            // 加载初始场景
+            loadScene('start');
+            
+            // 更新任务列表
+            updateTasks();
+            
+            // 保存游戏
+            saveGame();
+            
+            showNotification('游戏已重置');
+            
+            if (menuModal.style.display === 'flex') {
+                toggleMenu();
+            }
+        }
+        
+        // 返回故事选择器
+        function returnToSelector() {
+            // 保存当前游戏
+            if (currentStory && character) {
+                saveGame();
+            }
+            
+            // 重置当前故事和角色
+            currentStory = null;
+            character = null;
+            
+            // 显示故事选择器，隐藏游戏界面
+            storySelector.style.display = 'flex';
+            gameArea.style.display = 'none';
+            
+            if (menuModal.style.display === 'flex') {
+                toggleMenu();
+            }
+        }
+        
+        // 加载存档数据
+        function loadSaveData() {
+            const savedData = localStorage.getItem('mythologyGame');
+            if (savedData) {
+                saveData = JSON.parse(savedData);
+            }
+        }
+        
+        // 初始化游戏
+        window.addEventListener('DOMContentLoaded', initGame);
+    </script>
+</body>
+</html>
+<script>
+    // 移动端适配增强
+    document.addEventListener('DOMContentLoaded', function() {
+        // 检测设备类型
+        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        
+        // 移动端触摸优化
+        if (isMobile) {
+            // 防止双击缩放
+            document.addEventListener('touchstart', function(e) {
+                if (e.touches.length > 1) {
+                    e.preventDefault();
+                }
+            }, { passive: false });
+            
+            // 优化按钮点击体验
+            const allButtons = document.querySelectorAll('button, .story-option, .story-card');
+            allButtons.forEach(button => {
+                button.addEventListener('touchstart', function() {
+                    this.style.transform = 'scale(0.98)';
+                });
+                button.addEventListener('touchend', function() {
+                    this.style.transform = '';
+                });
+            });
+        }
+        
+        // 屏幕旋转处理
+        window.addEventListener('orientationchange', function() {
+            // 重新调整UI布局
+            setTimeout(function() {
+                adjustUIForOrientation();
+            }, 300);
+        });
+        
+        function adjustUIForOrientation() {
+            const isLandscape = window.innerWidth > window.innerHeight;
+            const gameArea = document.getElementById('gameArea');
+            
+            if (isLandscape && window.innerWidth <= 900) {
+                // 横屏模式下的特殊处理
+                if (gameArea.style.display !== 'none') {
+                    gameArea.style.flexDirection = 'row';
+                }
+            } else {
+                // 竖屏模式下恢复默认布局
+                if (window.innerWidth <= 768 && gameArea.style.display !== 'none') {
+                    gameArea.style.flexDirection = 'column';
+                }
+            }
+        }
+        
+        // 初始调整
+        adjustUIForOrientation();
+    });
+</script>
