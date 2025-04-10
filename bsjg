@@ -1,0 +1,523 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>基于单片机的农业灌溉系统架构</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.0.0/css/all.min.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            200: '#bae6fd',
+                            300: '#7dd3fc',
+                            400: '#38bdf8',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                            800: '#075985',
+                            900: '#0c4a6e',
+                        },
+                        success: {
+                            500: '#4CAF50',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap');
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+        }
+        .fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .hover-scale {
+            transition: transform 0.2s ease-in-out;
+        }
+        .hover-scale:hover {
+            transform: scale(1.02);
+        }
+    </style>
+</head>
+<body class="bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-200 transition-colors duration-300">
+    <!-- 主题切换按钮 -->
+    <div class="fixed top-4 right-4 z-50">
+        <button id="theme-toggle" class="p-2 rounded-full bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors">
+            <i class="fas fa-sun dark:hidden"></i>
+            <i class="fas fa-moon hidden dark:inline"></i>
+        </button>
+    </div>
+
+    <!-- 头部 -->
+    <header class="bg-white dark:bg-gray-800 shadow-sm py-6 mb-8">
+        <div class="container mx-auto px-4">
+            <h1 class="text-3xl md:text-4xl font-bold text-center text-primary-600 dark:text-primary-400 fade-in">基于单片机的农业灌溉系统架构</h1>
+            <p class="text-center text-gray-600 dark:text-gray-400 mt-2 fade-in">基于MQTT协议的物联网应用</p>
+        </div>
+    </header>
+
+    <!-- 主要内容 -->
+    <main class="container mx-auto px-4 pb-16">
+        <!-- 系统概述 -->
+        <section class="mb-16 fade-in">
+            <h2 class="text-2xl font-bold mb-6 text-primary-700 dark:text-primary-300 border-b pb-2 border-gray-200 dark:border-gray-700">系统概述</h2>
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 hover-scale">
+                <p class="mb-4">该系统是一个基于Spring MVC框架开发的智能农业监控系统，通过MQTT协议与硬件设备通信，实现对农业环境的实时监控和智能控制。系统可以采集多种环境参数，如空气温湿度、土壤温湿度、水箱水位和光照强度等，并根据预设阈值自动控制灌溉、补水等操作。</p>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
+                    <div class="bg-primary-50 dark:bg-gray-700 p-4 rounded-lg">
+                        <i class="fas fa-tachometer-alt text-primary-500 text-xl mb-2"></i>
+                        <h3 class="font-medium text-lg mb-2">实时监控</h3>
+                        <p class="text-sm text-gray-600 dark:text-gray-300">实时采集和显示各种环境参数数据</p>
+                    </div>
+                    <div class="bg-primary-50 dark:bg-gray-700 p-4 rounded-lg">
+                        <i class="fas fa-sliders-h text-primary-500 text-xl mb-2"></i>
+                        <h3 class="font-medium text-lg mb-2">智能控制</h3>
+                        <p class="text-sm text-gray-600 dark:text-gray-300">根据阈值自动控制或手动远程控制设备</p>
+                    </div>
+                    <div class="bg-primary-50 dark:bg-gray-700 p-4 rounded-lg">
+                        <i class="fas fa-chart-line text-primary-500 text-xl mb-2"></i>
+                        <h3 class="font-medium text-lg mb-2">数据分析</h3>
+                        <p class="text-sm text-gray-600 dark:text-gray-300">历史数据查询和分析，辅助农业决策</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 系统架构图 -->
+        <section class="mb-16 fade-in">
+            <h2 class="text-2xl font-bold mb-6 text-primary-700 dark:text-primary-300 border-b pb-2 border-gray-200 dark:border-gray-700">系统架构图</h2>
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 hover-scale">
+                <div class="w-full overflow-auto">
+                    <div class="min-w-[800px] h-[500px] mx-auto relative">
+                        <!-- 前端层 -->
+                        <div class="absolute top-0 left-0 right-0 h-24 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center">
+                            <div class="text-center">
+                                <h3 class="font-bold text-lg mb-1">前端展示层</h3>
+                                <p class="text-sm">Web界面 (HTML/CSS/JS) + 移动端应用</p>
+                            </div>
+                        </div>
+                        
+                        <!-- 控制层 -->
+                        <div class="absolute top-32 left-0 right-0 h-24 bg-green-100 dark:bg-green-900/30 rounded-lg flex items-center justify-center">
+                            <div class="text-center">
+                                <h3 class="font-bold text-lg mb-1">控制层 (Spring MVC)</h3>
+                                <p class="text-sm">DataController, ConfigController, ModeController</p>
+                            </div>
+                        </div>
+                        
+                        <!-- 服务层 -->
+                        <div class="absolute top-64 left-0 right-0 h-24 bg-yellow-100 dark:bg-yellow-900/30 rounded-lg flex items-center justify-center">
+                            <div class="text-center">
+                                <h3 class="font-bold text-lg mb-1">服务层</h3>
+                                <p class="text-sm">DataService, ConfigService, ModeService, Task</p>
+                            </div>
+                        </div>
+                        
+                        <!-- 数据层 -->
+                        <div class="absolute top-96 left-0 right-0 h-24 bg-purple-100 dark:bg-purple-900/30 rounded-lg flex items-center justify-center">
+                            <div class="text-center">
+                                <h3 class="font-bold text-lg mb-1">数据访问层</h3>
+                                <p class="text-sm">DataDao, ConfigDao, ModeDao, MySQL数据库</p>
+                            </div>
+                        </div>
+                        
+                        <!-- MQTT通信 -->
+                        <div class="absolute top-32 right-[-100px] h-[300px] w-24 bg-red-100 dark:bg-red-900/30 rounded-lg flex items-center justify-center">
+                            <div class="text-center rotate-90 transform origin-center">
+                                <h3 class="font-bold text-lg mb-1">MQTT通信</h3>
+                                <p class="text-sm">MqttClient</p>
+                            </div>
+                        </div>
+                        
+                        <!-- 硬件层 -->
+                        <div class="absolute bottom-0 left-0 right-0 h-24 bg-gray-200 dark:bg-gray-700 rounded-lg flex items-center justify-center">
+                            <div class="text-center">
+                                <h3 class="font-bold text-lg mb-1">硬件设备层</h3>
+                                <p class="text-sm">传感器 (温湿度、水位等) + 控制设备 (水泵、阀门等)</p>
+                            </div>
+                        </div>
+                        
+                        <!-- 连接线 -->
+                        <svg class="absolute inset-0 w-full h-full" xmlns="http://www.w3.org/2000/svg">
+                            <!-- 前端到控制层 -->
+                            <line x1="400" y1="96" x2="400" y2="128" stroke="currentColor" stroke-width="2" stroke-dasharray="5,5" />
+                            
+                            <!-- 控制层到服务层 -->
+                            <line x1="400" y1="176" x2="400" y2="208" stroke="currentColor" stroke-width="2" stroke-dasharray="5,5" />
+                            
+                            <!-- 服务层到数据层 -->
+                            <line x1="400" y1="256" x2="400" y2="288" stroke="currentColor" stroke-width="2" stroke-dasharray="5,5" />
+                            
+                            <!-- 数据层到硬件层 -->
+                            <line x1="400" y1="336" x2="400" y2="368" stroke="currentColor" stroke-width="2" stroke-dasharray="5,5" />
+                            
+                            <!-- MQTT到控制层 -->
+                            <line x1="700" y1="180" x2="600" y2="180" stroke="currentColor" stroke-width="2" stroke-dasharray="5,5" />
+                            
+                            <!-- MQTT到硬件层 -->
+                            <path d="M700,280 Q650,330 400,380" stroke="currentColor" fill="none" stroke-width="2" stroke-dasharray="5,5" />
+                        </svg>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 核心组件 -->
+        <section class="mb-16 fade-in">
+            <h2 class="text-2xl font-bold mb-6 text-primary-700 dark:text-primary-300 border-b pb-2 border-gray-200 dark:border-gray-700">核心组件</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- MQTT客户端 -->
+                <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 hover-scale">
+                    <div class="flex items-start">
+                        <div class="bg-primary-100 dark:bg-primary-900/50 p-3 rounded-full mr-4">
+                            <i class="fas fa-exchange-alt text-primary-500 text-xl"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-lg mb-2">MQTT客户端</h3>
+                            <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">负责与硬件设备进行通信，发送控制指令和接收传感器数据。</p>
+                            <div class="bg-gray-100 dark:bg-gray-700 p-3 rounded text-sm font-mono overflow-auto">
+                                <code>
+public static void publish(String code, String cmd) throws MqttException {<br>
+&nbsp;&nbsp;MqttClient client = getClient();<br>
+&nbsp;&nbsp;MqttTopic topic = client.getTopic(code+"_ctrl");<br>
+&nbsp;&nbsp;MqttMessage message = new MqttMessage(cmd.getBytes());<br>
+&nbsp;&nbsp;topic.publish(message);<br>
+}
+                                </code>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 数据控制器 -->
+                <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 hover-scale">
+                    <div class="flex items-start">
+                        <div class="bg-primary-100 dark:bg-primary-900/50 p-3 rounded-full mr-4">
+                            <i class="fas fa-cogs text-primary-500 text-xl"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-lg mb-2">数据控制器</h3>
+                            <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">处理数据采集、存储和自动控制逻辑的核心组件。</p>
+                            <div class="bg-gray-100 dark:bg-gray-700 p-3 rounded text-sm font-mono overflow-auto">
+                                <code>
+@RestController<br>
+@RequestMapping("data")<br>
+public class DataController extends AbstractController {<br>
+&nbsp;&nbsp;// 处理数据采集和自动控制<br>
+&nbsp;&nbsp;// 根据阈值自动控制设备<br>
+}
+                                </code>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 阈值检测 -->
+                <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 hover-scale">
+                    <div class="flex items-start">
+                        <div class="bg-primary-100 dark:bg-primary-900/50 p-3 rounded-full mr-4">
+                            <i class="fas fa-tasks text-primary-500 text-xl"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-lg mb-2">阈值检测</h3>
+                            <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">检测各项环境参数是否超出预设阈值范围。</p>
+                            <div class="bg-gray-100 dark:bg-gray-700 p-3 rounded text-sm font-mono overflow-auto">
+                                <code>
+public Map&lt;String, Boolean&gt; maxTest(Long obj) {<br>
+&nbsp;&nbsp;// 检查各项参数是否超过最大阈值<br>
+&nbsp;&nbsp;// 返回检测结果<br>
+}
+                                </code>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 配置管理 -->
+                <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 hover-scale">
+                    <div class="flex items-start">
+                        <div class="bg-primary-100 dark:bg-primary-900/50 p-3 rounded-full mr-4">
+                            <i class="fas fa-sliders-h text-primary-500 text-xl"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-lg mb-2">配置管理</h3>
+                            <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">管理系统各项参数的阈值配置。</p>
+                            <div class="bg-gray-100 dark:bg-gray-700 p-3 rounded text-sm font-mono overflow-auto">
+                                <code>
+@RestController<br>
+@RequestMapping("config")<br>
+public class ConfigController extends AbstractController {<br>
+&nbsp;&nbsp;// 管理阈值配置<br>
+&nbsp;&nbsp;// 保存、更新、查询配置<br>
+}
+                                </code>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 数据流程 -->
+        <section class="mb-16 fade-in">
+            <h2 class="text-2xl font-bold mb-6 text-primary-700 dark:text-primary-300 border-b pb-2 border-gray-200 dark:border-gray-700">数据流程</h2>
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 hover-scale">
+                <div class="relative">
+                    <div class="absolute left-4 top-0 bottom-0 w-0.5 bg-primary-200 dark:bg-primary-700"></div>
+                    
+                    <div class="relative pl-10 pb-10">
+                        <div class="absolute left-0 w-8 h-8 bg-primary-500 rounded-full flex items-center justify-center text-white">1</div>
+                        <h3 class="font-bold text-lg mb-2">数据采集</h3>
+                        <p class="text-gray-600 dark:text-gray-400">硬件设备通过传感器采集环境数据（空气温湿度、土壤温湿度、水箱水位、一氧化碳浓度等）。</p>
+                    </div>
+                    
+                    <div class="relative pl-10 pb-10">
+                        <div class="absolute left-0 w-8 h-8 bg-primary-500 rounded-full flex items-center justify-center text-white">2</div>
+                        <h3 class="font-bold text-lg mb-2">数据传输</h3>
+                        <p class="text-gray-600 dark:text-gray-400">通过MQTT协议将采集的数据发送到服务器，MqttClient接收数据。</p>
+                    </div>
+                    
+                    <div class="relative pl-10 pb-10">
+                        <div class="absolute left-0 w-8 h-8 bg-primary-500 rounded-full flex items-center justify-center text-white">3</div>
+                        <h3 class="font-bold text-lg mb-2">数据存储</h3>
+                        <p class="text-gray-600 dark:text-gray-400">DataController将接收到的数据保存到数据库中，以便后续查询和分析。</p>
+                    </div>
+                    
+                    <div class="relative pl-10 pb-10">
+                        <div class="absolute left-0 w-8 h-8 bg-primary-500 rounded-full flex items-center justify-center text-white">4</div>
+                        <h3 class="font-bold text-lg mb-2">阈值判断</h3>
+                        <p class="text-gray-600 dark:text-gray-400">Task组件将采集的数据与预设阈值进行比较，判断是否超出范围。</p>
+                    </div>
+                    
+                    <div class="relative pl-10 pb-10">
+                        <div class="absolute left-0 w-8 h-8 bg-primary-500 rounded-full flex items-center justify-center text-white">5</div>
+                        <h3 class="font-bold text-lg mb-2">自动控制</h3>
+                        <p class="text-gray-600 dark:text-gray-400">根据阈值判断结果，在自动模式下执行相应的控制操作：</p>
+                        <ul class="list-disc list-inside ml-4 text-gray-600 dark:text-gray-400">
+                            <li>土壤湿度低时自动浇水</li>
+                            <li>水箱水位低时自动补水</li>
+                            <li>异常情况下触发蜂鸣器报警</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="relative pl-10">
+                        <div class="absolute left-0 w-8 h-8 bg-primary-500 rounded-full flex items-center justify-center text-white">6</div>
+                        <h3 class="font-bold text-lg mb-2">指令发送</h3>
+                        <p class="text-gray-600 dark:text-gray-400">通过MQTT协议将控制指令发送给硬件设备，执行相应的操作。</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 功能模块 -->
+        <section class="mb-16 fade-in">
+            <h2 class="text-2xl font-bold mb-6 text-primary-700 dark:text-primary-300 border-b pb-2 border-gray-200 dark:border-gray-700">功能模块</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 hover-scale">
+                    <div class="text-center mb-4">
+                        <div class="inline-block p-3 bg-blue-100 dark:bg-blue-900/30 rounded-full mb-4">
+                            <i class="fas fa-desktop text-blue-500 text-2xl"></i>
+                        </div>
+                        <h3 class="font-bold text-lg">实时监控</h3>
+                    </div>
+                    <ul class="space-y-2 text-gray-600 dark:text-gray-400">
+                        <li class="flex items-center"><i class="fas fa-check text-green-500 mr-2"></i> 实时显示各种环境参数</li>
+                        <li class="flex items-center"><i class="fas fa-check text-green-500 mr-2"></i> 参数超出阈值时报警提示</li>
+                        <li class="flex items-center"><i class="fas fa-check text-green-500 mr-2"></i> 设备连接状态监控</li>
+                    </ul>
+                </div>
+                
+                <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 hover-scale">
+                    <div class="text-center mb-4">
+                        <div class="inline-block p-3 bg-green-100 dark:bg-green-900/30 rounded-full mb-4">
+                            <i class="fas fa-cog text-green-500 text-2xl"></i>
+                        </div>
+                        <h3 class="font-bold text-lg">智能控制</h3>
+                    </div>
+                    <ul class="space-y-2 text-gray-600 dark:text-gray-400">
+                        <li class="flex items-center"><i class="fas fa-check text-green-500 mr-2"></i> 自动/手动模式切换</li>
+                        <li class="flex items-center"><i class="fas fa-check text-green-500 mr-2"></i> 自动浇水、补水控制</li>
+                        <li class="flex items-center"><i class="fas fa-check text-green-500 mr-2"></i> 远程手动控制设备</li>
+                    </ul>
+                </div>
+                
+                <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 hover-scale">
+                    <div class="text-center mb-4">
+                        <div class="inline-block p-3 bg-purple-100 dark:bg-purple-900/30 rounded-full mb-4">
+                            <i class="fas fa-cogs text-purple-500 text-2xl"></i>
+                        </div>
+                        <h3 class="font-bold text-lg">系统配置</h3>
+                    </div>
+                    <ul class="space-y-2 text-gray-600 dark:text-gray-400">
+                        <li class="flex items-center"><i class="fas fa-check text-green-500 mr-2"></i> 阈值参数配置</li>
+                        <li class="flex items-center"><i class="fas fa-check text-green-500 mr-2"></i> 设备信息管理</li>
+                        <li class="flex items-center"><i class="fas fa-check text-green-500 mr-2"></i> 用户权限管理</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- 技术栈 -->
+        <section class="fade-in">
+            <h2 class="text-2xl font-bold mb-6 text-primary-700 dark:text-primary-300 border-b pb-2 border-gray-200 dark:border-gray-700">技术栈</h2>
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 hover-scale">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div>
+                        <h3 class="font-bold text-lg mb-4 flex items-center">
+                            <i class="fas fa-server text-primary-500 mr-2"></i> 后端技术
+                        </h3>
+                        <ul class="space-y-3">
+                            <li class="flex items-center">
+                                <div class="w-24 font-medium">Spring MVC</div>
+                                <div class="flex-1 bg-gray-200 dark:bg-gray-700 h-2 rounded-full">
+                                    <div class="bg-primary-500 h-2 rounded-full" style="width: 90%"></div>
+                                </div>
+                            </li>
+                            <li class="flex items-center">
+                                <div class="w-24 font-medium">MyBatis</div>
+                                <div class="flex-1 bg-gray-200 dark:bg-gray-700 h-2 rounded-full">
+                                    <div class="bg-primary-500 h-2 rounded-full" style="width: 85%"></div>
+                                </div>
+                            </li>
+                            <li class="flex items-center">
+                                <div class="w-24 font-medium">MySQL</div>
+                                <div class="flex-1 bg-gray-200 dark:bg-gray-700 h-2 rounded-full">
+                                    <div class="bg-primary-500 h-2 rounded-full" style="width: 80%"></div>
+                                </div>
+                            </li>
+                            <li class="flex items-center">
+                                <div class="w-24 font-medium">MQTT</div>
+                                <div class="flex-1 bg-gray-200 dark:bg-gray-700 h-2 rounded-full">
+                                    <div class="bg-primary-500 h-2 rounded-full" style="width: 75%"></div>
+                                </div>
+                            </li>
+                            <li class="flex items-center">
+                                <div class="w-24 font-medium">Shiro</div>
+                                <div class="flex-1 bg-gray-200 dark:bg-gray-700 h-2 rounded-full">
+                                    <div class="bg-primary-500 h-2 rounded-full" style="width: 70%"></div>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                    
+                    <div>
+                        <h3 class="font-bold text-lg mb-4 flex items-center">
+                            <i class="fas fa-desktop text-primary-500 mr-2"></i> 前端技术
+                        </h3>
+                        <ul class="space-y-3">
+                            <li class="flex items-center">
+                                <div class="w-24 font-medium">jQuery</div>
+                                <div class="flex-1 bg-gray-200 dark:bg-gray-700 h-2 rounded-full">
+                                    <div class="bg-primary-500 h-2 rounded-full" style="width: 85%"></div>
+                                </div>
+                            </li>
+                            <li class="flex items-center">
+                                <div class="w-24 font-medium">Vue.js</div>
+                                <div class="flex-1 bg-gray-200 dark:bg-gray-700 h-2 rounded-full">
+                                    <div class="bg-primary-500 h-2 rounded-full" style="width: 80%"></div>
+                                </div>
+                            </li>
+                            <li class="flex items-center">
+                                <div class="w-24 font-medium">Bootstrap</div>
+                                <div class="flex-1 bg-gray-200 dark:bg-gray-700 h-2 rounded-full">
+                                    <div class="bg-primary-500 h-2 rounded-full" style="width: 75%"></div>
+                                </div>
+                            </li>
+                            <li class="flex items-center">
+                                <div class="w-24 font-medium">HTML/CSS</div>
+                                <div class="flex-1 bg-gray-200 dark:bg-gray-700 h-2 rounded-full">
+                                    <div class="bg-primary-500 h-2
+                                    <li class="flex items-center">
+                                        <!-- <div class="w-24 font-medium">HTML/CSS</div> -->
+                                        <div class="flex-1 bg-gray-200 dark:bg-gray-700 h-2 rounded-full">
+                                            <div class="bg-primary-500 h-2 rounded-full" style="width: 70%"></div>
+                                        </div>
+                                    </li>
+                                    <li class="flex items-center">
+                                        <div class="w-24 font-medium">ECharts</div>
+                                        <div class="flex-1 bg-gray-200 dark:bg-gray-700 h-2 rounded-full">
+                                            <div class="bg-primary-500 h-2 rounded-full" style="width: 65%"></div>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </main>
+        
+            <!-- 页脚 -->
+            <footer class="bg-white dark:bg-gray-800 py-8 border-t border-gray-200 dark:border-gray-700">
+                <div class="container mx-auto px-4">
+                    <div class="flex flex-col md:flex-row justify-between items-center">
+                        <div class="mb-4 md:mb-0">
+                            <h3 class="text-lg font-bold mb-2">基于单片机的农业灌溉系统</h3>
+                            <p class="text-sm text-gray-600 dark:text-gray-400">基于MQTT协议的物联网应用</p>
+                        </div>
+                        <div class="flex space-x-4">
+                            <a href="https://github.com/author" class="text-gray-500 hover:text-primary-500 transition-colors">
+                                <i class="fab fa-github text-xl"></i>
+                            </a>
+                            <a href="https://twitter.com/author" class="text-gray-500 hover:text-primary-500 transition-colors">
+                                <i class="fab fa-twitter text-xl"></i>
+                            </a>
+                            <a href="https://linkedin.com/in/author" class="text-gray-500 hover:text-primary-500 transition-colors">
+                                <i class="fab fa-linkedin text-xl"></i>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="mt-6 text-center text-sm text-gray-500 dark:text-gray-400">
+                        <p>© 2023 [janrom]. 保留所有权利。</p>
+                    </div>
+                </div>
+            </footer>
+        
+            <!-- JavaScript -->
+            <script>
+                // 主题切换
+                const themeToggle = document.getElementById('theme-toggle');
+                
+                // 检查系统主题偏好
+                if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                    document.documentElement.classList.add('dark');
+                }
+                
+                // 主题切换按钮点击事件
+                themeToggle.addEventListener('click', () => {
+                    document.documentElement.classList.toggle('dark');
+                });
+                
+                // 添加淡入动画
+                const fadeElements = document.querySelectorAll('.fade-in');
+                const observer = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            entry.target.style.opacity = 1;
+                            entry.target.style.transform = 'translateY(0)';
+                        }
+                    });
+                }, { threshold: 0.1 });
+                
+                fadeElements.forEach(element => {
+                    element.style.opacity = 0;
+                    element.style.transform = 'translateY(10px)';
+                    element.style.transition = 'opacity 0.5s ease-in-out, transform 0.5s ease-in-out';
+                    observer.observe(element);
+                });
+            </script>
+        </body>
+        </html>
